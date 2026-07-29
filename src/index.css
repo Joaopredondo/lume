@@ -1,0 +1,237 @@
+@import 'tailwindcss';
+
+/*
+ * Fontes locais. Nada de CDN: o app precisa funcionar 100% offline (seção 5).
+ * `font-display: block` porque texto invisível por um instante é preferível a
+ * texto trocando de forma no meio da leitura de quem tem baixa visão extrema.
+ */
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/AtkinsonHyperlegibleNext-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/AtkinsonHyperlegibleNext-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Space Grotesk Variable';
+  src: url('/fonts/SpaceGrotesk-Variable.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: block;
+}
+
+@theme {
+  /* Seção 3: paleta de cartaz serigrafado. Só isto sobre preto na Camada Estímulo. */
+  --color-tinta-preta: #050505;
+  --color-giz-branco: #fafaf7;
+  --color-amarelo-sinal: #ffe600;
+  --color-laranja-sinal: #ff6a00;
+  --color-ciano-sinal: #00e5ff;
+  --color-verde-sinal: #00e676;
+  /*
+   * Azul não estava na paleta original, mas a atividade impressa de Círculos e
+   * setas usa exatamente quatro cores — azul, verde, vermelho, amarelo — e o
+   * app é réplica dela. Ciano não substitui sem descaracterizar o material.
+   *
+   * Atenção clínica: azul sobre preto é a pior combinação para baixa visão
+   * (luminância baixa, cones azuis escassos na fóvea). Por isso ele só é usado
+   * em módulos cognitivos, nunca como estímulo primário — ver docs/PALETA.md.
+   */
+  --color-azul-sinal: #2979ff;
+  --color-magenta-sinal: #ff2d95;
+  --color-vermelho-sinal: #ff1e1e;
+
+  /* Os dois únicos neutros extras, e só na Camada Cuidador. */
+  --color-superficie: #1a1a1a;
+  --color-texto-secundario: #8a8a85;
+
+  --font-estimulo: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --font-interface: 'Space Grotesk Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    background-color: var(--color-tinta-preta);
+    color: var(--color-giz-branco);
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-interface);
+    background-color: var(--color-tinta-preta);
+  }
+
+  /* Seção 8: foco sempre visível, anel de 6px em amarelo-sinal. */
+  :focus-visible {
+    outline: 6px solid var(--color-amarelo-sinal);
+    outline-offset: 3px;
+  }
+
+  /*
+   * Controles de faixa. O padrão do navegador é azul — a única cor que este
+   * projeto documenta como a pior sobre preto (ver docs/PALETA.md), e ainda por
+   * cima fora da identidade. O alvo também precisa ser grande: quem arrasta é
+   * um adulto, mas às vezes no escuro.
+   */
+  input[type='range'] {
+    appearance: none;
+    height: 2.75rem;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 0.5rem;
+    border-radius: 999px;
+    /* `superficie` some contra o cartão, que é da mesma família. */
+    background: color-mix(in srgb, var(--color-texto-secundario) 45%, transparent);
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 0.5rem;
+    border-radius: 999px;
+    /* `superficie` some contra o cartão, que é da mesma família. */
+    background: color-mix(in srgb, var(--color-texto-secundario) 45%, transparent);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 2rem;
+    height: 2rem;
+    margin-top: -0.75rem;
+    border-radius: 50%;
+    background: var(--color-amarelo-sinal);
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-amarelo-sinal);
+  }
+
+  /*
+   * Regra 4.6. Rede de segurança, não o mecanismo principal.
+   *
+   * Deliberadamente NÃO sobrescreve `animation-duration`: em CSS só dá para
+   * impor uma duração fixa, e isso *acelera* qualquer animação mais lenta que
+   * ela. Uma travessia de 12s virando 1s produziria uma forma cruzando a tela
+   * a cada segundo — o oposto de um modo calmo, e um risco de estímulo
+   * repetitivo. Quem suprime movimento é o módulo, via `nucleo/movimento.ts`.
+   *
+   * O que fica aqui só pode desacelerar ou reduzir: uma repetição a menos e
+   * transições clampadas em 1s.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-iteration-count: 1 !important;
+      transition-duration: 1s !important;
+    }
+  }
+
+  :root[data-calmo='true'] *,
+  :root[data-calmo='true'] *::before,
+  :root[data-calmo='true'] *::after {
+    animation-iteration-count: 1 !important;
+    transition-duration: 1s !important;
+  }
+}
+
+/*
+ * Animações da Camada Estímulo. Só `opacity` e `transform` (regra 4.2) — nada
+ * que mude cor, tamanho de caixa ou provoque reflow. Todas rodam uma vez só;
+ * a única repetição autorizada no app é a lanterna.
+ */
+
+/* Causa e efeito: cresce a partir do toque e some. Começa já visível em 60%
+   para o efeito ser percebido no primeiro quadro, não depois da rampa. */
+@keyframes surgir-e-sumir {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* Estimulação visual: troca de cor entre travessias, sempre por fade. */
+@keyframes entrar-por-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * A travessia, de fora da borda esquerda até fora da direita.
+ *
+ * `--entrada` e `--saida` são definidas no elemento porque dependem da largura
+ * da tela e do tamanho do estímulo — recalculadas a cada giro, sem número fixo
+ * no CSS. Usar uma distância simétrica aqui faria a forma passar metade do
+ * percurso fora da tela, deixando o cuidador olhando para o vazio.
+ *
+ * Roda uma vez; o módulo encadeia a próxima no `animationend`.
+ */
+@keyframes atravessar {
+  from {
+    transform: translate3d(var(--entrada), 0, 0);
+  }
+  to {
+    transform: translate3d(var(--saida), 0, 0);
+  }
+}
+
+/*
+ * Pulsação do ponto de partida do Traçado.
+ *
+ * É a única animação do app que se repete, e a regra 4.1 permite exatamente
+ * este caso: altera **só** `transform`, sem nenhuma mudança de luminância, com
+ * período de 4s. Não coloque `opacity`, `fill` ou `background` aqui — o teste
+ * de segurança lê esta keyframe e falha se aparecer qualquer coisa fora de
+ * `transform`.
+ */
+@keyframes pulsar-partida {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Aparição sem movimento, para quando o Modo calmo suprime o `scale`. */
+@keyframes surgir-e-sumir-calmo {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

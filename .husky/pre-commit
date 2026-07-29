@@ -1,0 +1,3 @@
+npx oxlint
+npx prettier --check .
+npx vitest run
