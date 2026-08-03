@@ -30,7 +30,7 @@ const ANIMAIS: { id: IdDeSilhueta; nome: string }[] = [
  * Quando o perfil confirmou a cor, ela é usada; se não, cai na primeira cor
  * com resposta — fidelidade ao cartão nunca passa na frente da calibração.
  */
-const COR_DO_CARTAO: Record<IdDeSilhueta, TokenDeCor> = {
+const COR_DO_CARTAO: Partial<Record<IdDeSilhueta, TokenDeCor>> = {
   polvo: 'laranja-sinal',
   peixe: 'amarelo-sinal',
   elefante: 'amarelo-sinal',
@@ -87,11 +87,9 @@ export function Animais({ posicao }: PropsDoModulo) {
     menorDimensao,
   );
 
-  const cor = animal
-    ? cores.includes(COR_DO_CARTAO[animal.id])
-      ? COR_DO_CARTAO[animal.id]
-      : (cores[0] ?? 'amarelo-sinal')
-    : 'amarelo-sinal';
+  const corDoCartao = animal ? COR_DO_CARTAO[animal.id] : undefined;
+  const cor =
+    corDoCartao && cores.includes(corDoCartao) ? corDoCartao : (cores[0] ?? 'amarelo-sinal');
 
   const caixa = estiloDePosicao(posicao, lado, largura, altura);
 

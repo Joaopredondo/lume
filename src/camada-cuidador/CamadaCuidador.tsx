@@ -20,7 +20,7 @@ export function CamadaCuidador({ titulo, children }: Props) {
   return (
     <div className="min-h-dvh bg-tinta-preta font-interface text-giz-branco">
       <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
-        <header className="mb-8 sm:mb-10 lg:mb-14">
+        <header data-imprimir="nao" className="mb-8 sm:mb-10 lg:mb-14">
           <p className="text-xs tracking-[0.2em] text-texto-secundario uppercase sm:text-sm">
             Lume
           </p>

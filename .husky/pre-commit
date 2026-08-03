@@ -1,3 +1,9 @@
+# Rápido de propósito: tipos, lint e formatação.
+npx tsc -b
 npx oxlint
 npx prettier --check .
-npx vitest run
+
+# A varredura das regras clínicas (nada pisca, nenhuma duração abaixo de 800ms,
+# nenhum tamanho de estímulo escrito à mão). Lê arquivo, não monta componente:
+# roda em ~1s e não é ela que pendura a suíte.
+npx vitest run src/nucleo/seguranca.test.ts

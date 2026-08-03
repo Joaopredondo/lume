@@ -60,5 +60,14 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    /*
+     * Tetos explícitos. Os testes de componente montam a Camada Estímulo, que
+     * abre BroadcastChannel, laços de rAF e conexões do Dexie; handle que
+     * escapa da limpeza pendura o processo depois de os testes já terem
+     * passado. Com teto, isso falha com mensagem em vez de travar em silêncio.
+     */
+    testTimeout: 10000,
+    hookTimeout: 10000,
+    teardownTimeout: 5000,
   },
 });

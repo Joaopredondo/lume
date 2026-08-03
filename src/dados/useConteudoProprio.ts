@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listarConteudo, type ConteudoProprio } from './db';
+import { listarConteudo, type CategoriaDeConteudo, type ConteudoProprio } from './db';
 import { useStore } from './store';
 
 /**
@@ -11,7 +11,7 @@ import { useStore } from './store';
  */
 export type ItemProprio = ConteudoProprio & { url: string };
 
-export function useConteudoProprio(): ItemProprio[] {
+export function useConteudoProprio(categoria?: CategoriaDeConteudo): ItemProprio[] {
   const perfilId = useStore((estado) => estado.perfil.id);
   const [itens, setItens] = useState<ItemProprio[]>([]);
 
@@ -19,7 +19,7 @@ export function useConteudoProprio(): ItemProprio[] {
     let vivo = true;
     const urls: string[] = [];
 
-    void listarConteudo(perfilId).then((registros) => {
+    void listarConteudo(perfilId, categoria).then((registros) => {
       if (!vivo) return;
       setItens(
         registros.map((registro) => {
@@ -35,7 +35,7 @@ export function useConteudoProprio(): ItemProprio[] {
       // Blob sem revoke vaza memória a cada troca de perfil ou de módulo.
       for (const url of urls) URL.revokeObjectURL(url);
     };
-  }, [perfilId]);
+  }, [perfilId, categoria]);
 
   return itens;
 }

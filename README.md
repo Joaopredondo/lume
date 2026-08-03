@@ -12,10 +12,42 @@ Não é um gerador de imagens: é um **instrumento de observação**. Apresenta 
 npm run dev         # servidor de desenvolvimento
 npm run build       # tsc -b && vite build
 npm run verificar   # tsc + oxlint + prettier + vitest — roda tudo
-npm run teste       # só os testes
+npm run teste       # suíte unitária (jsdom)
+npm run teste:e2e   # Playwright em Chromium de verdade
+npm run teste:telas # gera screenshot de cada tela em 3 tamanhos
 ```
 
-O `pre-commit` roda oxlint, Prettier e Vitest.
+O `pre-commit` roda tipos, lint, formatação e a varredura das regras clínicas —
+tudo rápido, nada que monte componente.
+
+### Por que a suíte inteira não roda no pre-commit
+
+Os testes de componente montam a Camada Estímulo, e ela abre `BroadcastChannel`,
+laços de `requestAnimationFrame` e conexões do Dexie. Handles que escapam da
+limpeza deixam o processo do Vitest pendurado depois que os testes já passaram —
+o commit ficava bloqueado por um problema de teardown, não por defeito no código.
+
+Então o pre-commit ficou com o que é barato e cobre o que importa: `tsc`,
+`oxlint`, Prettier e `src/nucleo/seguranca.test.ts`, a varredura que garante as
+regras clínicas. Ela lê arquivo, não renderiza nada, e roda em ~1s.
+
+A suíte completa continua disponível em `npm run teste`, para rodar de propósito
+quando fizer sentido. O vazamento de handles nos testes de componente é dívida
+conhecida, não está resolvido.
+
+### Testes de ponta a ponta
+
+`npm run teste:e2e` roda em Chromium de verdade, contra o build, em três
+tamanhos (celular, tablet, TV). É onde se verifica o que jsdom nunca alcança:
+o service worker instalando, as fontes carregando, o SVG desenhado, e o app
+abrindo **com a rede desligada**.
+
+`npm run teste:telas` fotografa cada tela do app em cada tamanho e grava em
+`e2e/telas/`. Não afirma nada — a inspeção é humana. Existe porque o app foi
+construído quase inteiro sem ninguém ver um pixel.
+
+**Ainda não rodado:** os screenshots nunca foram gerados e o Lighthouse nunca
+foi executado. A largura de celular segue sem verificação visual.
 
 ## Decisões de arquitetura
 

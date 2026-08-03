@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { EventoResposta } from '../nucleo/eventos';
+import type { Ficha } from './ficha';
 import type { CalibracaoDeAparelho, Perfil } from './tipos';
 
 /**
@@ -29,14 +30,34 @@ export type EventoSalvo = EventoResposta & {
   perfilId: string;
 };
 
-/** Palavra e figura cadastradas pelo cuidador (Alfabeto e Animais). */
+/**
+ * Categoria do conteúdo cadastrado pelo voluntário.
+ *
+ * `palavra` alimenta Alfabeto e Animais; `figurinha` entra na bandeja do quadro
+ * Agora e depois. O fluxo de cadastro é o mesmo — muda só onde aparece.
+ */
+export type CategoriaDeConteudo = 'palavra' | 'figurinha';
+
+/** Palavra e figura cadastradas pelo cuidador. */
 export type ConteudoProprio = {
   id: string;
   perfilId: string;
   palavra: string;
+  categoria: CategoriaDeConteudo;
   /** Silhueta gerada de uma foto, já limiarizada em cor única. */
   imagem: Blob;
   criadoEm: number;
+};
+
+/**
+ * Rotina do culto, guardada por perfil.
+ *
+ * É a mesma toda semana. Redigitar a cada culto inviabilizaria o uso, então a
+ * fila persiste e o voluntário só ajusta o que mudou.
+ */
+export type RotinaSalva = {
+  perfilId: string;
+  passos: string[];
 };
 
 const ID_DESTE_APARELHO = 'este';
@@ -47,6 +68,8 @@ class BancoDoApp extends Dexie {
   sessoes!: EntityTable<Sessao, 'id'>;
   eventos!: EntityTable<EventoSalvo, 'id'>;
   conteudo!: EntityTable<ConteudoProprio, 'id'>;
+  fichas!: EntityTable<Ficha, 'id'>;
+  rotinas!: EntityTable<RotinaSalva, 'perfilId'>;
 
   constructor() {
     super('lume');
@@ -63,6 +86,29 @@ class BancoDoApp extends Dexie {
       eventos: '++id, sessaoId, perfilId, em',
       conteudo: 'id, perfilId, palavra',
     });
+    /*
+     * Versões anteriores ficam intactas: há aparelhos em uso, e o Dexie aplica
+     * a cadeia de upgrades a partir da versão gravada lá.
+     */
+    this.version(3)
+      .stores({
+        perfis: 'id, nome',
+        aparelhos: 'id',
+        sessoes: 'id, perfilId, inicio',
+        eventos: '++id, sessaoId, perfilId, em',
+        conteudo: 'id, perfilId, palavra, categoria',
+        fichas: 'id, perfilId, data',
+        rotinas: 'perfilId',
+      })
+      .upgrade(async (tx) => {
+        // Tudo que já existia era palavra do Alfabeto e dos Animais.
+        await tx
+          .table<ConteudoProprio>('conteudo')
+          .toCollection()
+          .modify((registro) => {
+            registro.categoria = 'palavra';
+          });
+      });
   }
 }
 
@@ -96,8 +142,14 @@ export async function listarEventos(perfilId: string): Promise<EventoSalvo[]> {
   return eventos.sort((a, b) => a.em - b.em);
 }
 
-export async function listarConteudo(perfilId: string): Promise<ConteudoProprio[]> {
-  return db.conteudo.where('perfilId').equals(perfilId).toArray();
+export async function listarConteudo(
+  perfilId: string,
+  categoria?: CategoriaDeConteudo,
+): Promise<ConteudoProprio[]> {
+  const todos = await db.conteudo.where('perfilId').equals(perfilId).toArray();
+  if (!categoria) return todos;
+  // Registros anteriores à versão 3 podem não ter categoria gravada ainda.
+  return todos.filter((item) => (item.categoria ?? 'palavra') === categoria);
 }
 
 /**
@@ -105,10 +157,17 @@ export async function listarConteudo(perfilId: string): Promise<ConteudoProprio[
  * dados do aparelho, já que não existe servidor para pedir remoção.
  */
 export async function apagarDadosDoPerfil(perfilId: string): Promise<void> {
-  await db.transaction('rw', db.perfis, db.sessoes, db.eventos, db.conteudo, async () => {
-    await db.eventos.where('perfilId').equals(perfilId).delete();
-    await db.sessoes.where('perfilId').equals(perfilId).delete();
-    await db.conteudo.where('perfilId').equals(perfilId).delete();
-    await db.perfis.delete(perfilId);
-  });
+  await db.transaction(
+    'rw',
+    [db.perfis, db.sessoes, db.eventos, db.conteudo, db.fichas, db.rotinas],
+    async () => {
+      await db.eventos.where('perfilId').equals(perfilId).delete();
+      await db.sessoes.where('perfilId').equals(perfilId).delete();
+      await db.conteudo.where('perfilId').equals(perfilId).delete();
+      // Sem estas duas o "apagar tudo" mentiria: a ficha guarda laudo e idade.
+      await db.fichas.where('perfilId').equals(perfilId).delete();
+      await db.rotinas.delete(perfilId);
+      await db.perfis.delete(perfilId);
+    },
+  );
 }

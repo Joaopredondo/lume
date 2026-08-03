@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { db, listarConteudo, type ConteudoProprio as Registro } from '../dados/db';
+import {
+  db,
+  listarConteudo,
+  type CategoriaDeConteudo,
+  type ConteudoProprio as Registro,
+} from '../dados/db';
 import { useStore } from '../dados/store';
 import { fotoParaSilhueta } from '../nucleo/silhueta-de-foto';
 
@@ -15,6 +20,7 @@ export function ConteudoProprio() {
   const perfil = useStore((estado) => estado.perfil);
   const [itens, setItens] = useState<Registro[]>([]);
   const [palavra, setPalavra] = useState('');
+  const [categoria, setCategoria] = useState<CategoriaDeConteudo>('palavra');
   const [processando, setProcessando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -32,6 +38,7 @@ export function ConteudoProprio() {
         id: crypto.randomUUID(),
         perfilId: perfil.id,
         palavra: palavra.trim(),
+        categoria,
         imagem,
         criadoEm: Date.now(),
       });
@@ -47,15 +54,44 @@ export function ConteudoProprio() {
   return (
     <div className="flex flex-col gap-8">
       <p className="max-w-prose text-base text-texto-secundario">
-        Palavras do repertório da pessoa atendida, com a figura que faz sentido para ela. Depois de
-        cadastradas, entram no rodízio dos módulos <span className="text-giz-branco">Alfabeto</span>{' '}
-        e <span className="text-giz-branco">Animais</span> do perfil{' '}
-        <span className="text-giz-branco">{perfil.nome}</span>.
+        Figuras do repertório da pessoa atendida, do perfil{' '}
+        <span className="text-giz-branco">{perfil.nome}</span>. Uma{' '}
+        <span className="text-giz-branco">palavra</span> entra no rodízio do Alfabeto e dos Animais;
+        uma <span className="text-giz-branco">figurinha</span> entra na bandeja do quadro Agora e
+        depois.
       </p>
 
       <div className="rounded-xl bg-superficie/60 p-5 ring-1 ring-texto-secundario/20 sm:p-6">
-        <label className="block">
-          <span className="text-base font-medium">Palavra</span>
+        <fieldset className="border-0 p-0">
+          <legend className="text-base font-medium">Onde vai aparecer</legend>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {(
+              [
+                ['palavra', 'Palavra — Alfabeto e Animais'],
+                ['figurinha', 'Figurinha — Agora e depois'],
+              ] as const
+            ).map(([valor, rotulo]) => (
+              <button
+                key={valor}
+                type="button"
+                aria-pressed={categoria === valor}
+                onClick={() => setCategoria(valor)}
+                className={`min-h-14 rounded-lg px-5 text-base font-medium ${
+                  categoria === valor
+                    ? 'bg-amarelo-sinal text-tinta-preta'
+                    : 'bg-tinta-preta text-giz-branco ring-2 ring-texto-secundario/40'
+                }`}
+              >
+                {rotulo}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <label className="mt-6 block">
+          <span className="text-base font-medium">
+            {categoria === 'figurinha' ? 'Nome da figurinha' : 'Palavra'}
+          </span>
           <input
             type="text"
             value={palavra}
@@ -65,7 +101,9 @@ export function ConteudoProprio() {
               // parecia que o cadastro estava travado.
               if (erro) setErro(null);
             }}
-            placeholder="mamãe, cachorro, mamadeira…"
+            placeholder={
+              categoria === 'figurinha' ? 'lanche, banheiro, professora…' : 'mamãe, cachorro…'
+            }
             className="mt-2 min-h-14 w-full max-w-md rounded-lg bg-tinta-preta px-4 text-lg text-giz-branco ring-2 ring-texto-secundario/40 focus:ring-amarelo-sinal"
           />
         </label>
@@ -115,6 +153,9 @@ export function ConteudoProprio() {
                 <Previa imagem={item.imagem} palavra={item.palavra} />
               </div>
               <p className="mt-3 text-base font-medium">{item.palavra}</p>
+              <p className="text-xs tracking-wide text-texto-secundario uppercase">
+                {(item.categoria ?? 'palavra') === 'figurinha' ? 'figurinha' : 'palavra'}
+              </p>
               <button
                 type="button"
                 onClick={() => void db.conteudo.delete(item.id).then(recarregar)}

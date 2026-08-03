@@ -25,3 +25,16 @@ Todos os dados — perfis, calibrações, sessões e eventos de resposta — fic
 A única exceção é o modo de controle remoto entre dispositivos separados, desligado por padrão e rotulado como "requer internet" na interface.
 
 Limpar os dados do navegador apaga tudo. Use a exportação em CSV/JSON antes.
+
+## Ficha do culto — dado sensível
+
+A ficha guarda **nome, idade e laudo de uma criança**. Isso é dado de saúde de
+menor, e merece cuidado maior que o resto do app.
+
+- A ficha abre só depois de segurar o botão por 3 segundos, como a
+  Configuração. Nunca a um toque.
+- Tudo continua no aparelho, sem servidor. **Quem empresta o tablet leva o
+  histórico junto** — não há login separando um voluntário do outro.
+- "Apagar dados deste perfil" remove também as fichas e a rotina salva. Se
+  algum dia deixar de remover, o botão passa a mentir.
+- Antes de repassar ou devolver um aparelho, apague os perfis.

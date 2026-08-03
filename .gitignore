@@ -6,3 +6,6 @@ dev-dist
 .vscode/*
 !.vscode/extensions.json
 .vercel
+e2e/telas
+test-results
+playwright-report

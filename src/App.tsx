@@ -4,6 +4,7 @@ import { Calibracao } from './camada-cuidador/Calibracao';
 import { CamadaCuidador } from './camada-cuidador/CamadaCuidador';
 import { Configuracao } from './camada-cuidador/Configuracao';
 import { ConteudoProprio } from './camada-cuidador/ConteudoProprio';
+import { Ficha } from './camada-cuidador/Ficha';
 import { Historico } from './camada-cuidador/Historico';
 import { NovoPerfil } from './camada-cuidador/NovoPerfil';
 import { SelecaoDeModulo } from './camada-cuidador/SelecaoDeModulo';
@@ -22,7 +23,7 @@ import { abrirEspelhoLocal, papelDaUrl, type Transporte } from './nucleo/espelho
 import { estimuloVigente, marcarResposta } from './nucleo/eventos';
 import { useLembreteDePausa } from './nucleo/pausa';
 
-type Tela = 'inicio' | 'calibracao' | 'configuracao' | 'historico' | 'conteudo';
+type Tela = 'inicio' | 'calibracao' | 'configuracao' | 'historico' | 'conteudo' | 'ficha';
 
 export default function App() {
   // `?papel=controle` abre a superfície de comando em vez do palco. É a única
@@ -157,6 +158,7 @@ function Palco() {
       configuracao: 'Configuração',
       historico: 'Histórico',
       conteudo: 'Conteúdo próprio',
+      ficha: 'Ficha do culto',
     };
 
     return (
@@ -165,9 +167,11 @@ function Palco() {
         {tela === 'configuracao' && <Configuracao />}
         {tela === 'historico' && <Historico />}
         {tela === 'conteudo' && <ConteudoProprio />}
+        {tela === 'ficha' && <Ficha />}
         <button
           type="button"
           onClick={voltar}
+          data-imprimir="nao"
           className="mt-12 min-h-14 rounded-lg bg-superficie px-6 text-base font-medium"
         >
           Voltar
@@ -278,6 +282,11 @@ function Palco() {
         >
           Conteúdo próprio
         </button>
+        {/*
+          A ficha guarda idade e laudo — dado de saúde de menor. Abre atrás do
+          mesmo gesto de 3s da Configuração, nunca a um toque.
+        */}
+        <BotaoSegurar rotulo="Ficha do culto" aoCompletar={() => setTela('ficha')} />
         <BotaoSegurar rotulo="Configuração" aoCompletar={() => setTela('configuracao')} />
       </div>
 

@@ -27,7 +27,16 @@ export type IdDeSilhueta =
   | 'casa'
   | 'coracao'
   | 'estrela'
-  | 'lua';
+  | 'lua'
+  // Figurinhas da rotina do culto (quadro Agora e depois).
+  | 'nota'
+  | 'livro'
+  | 'maca'
+  | 'copo'
+  | 'gota'
+  | 'ampulheta'
+  | 'fone'
+  | 'lapis';
 
 type Desenho = { corpo: string; detalhes?: string[] };
 
@@ -79,10 +88,59 @@ const DESENHOS: Record<IdDeSilhueta, Desenho> = {
   estrela: {
     corpo: 'M50 4 62 38h36L69 59l11 35-30-22-30 22 11-35L2 38h36L50 4Z',
   },
+  /*
+   * Lua: dois arcos que sobram um do outro, formando a foice.
+   *
+   * O path original — `44 44 ... 1 0` seguido de `36 36 ... 0 1` — **não
+   * pintava nada**. Os dois arcos varriam em sentidos opostos e se anulavam
+   * pela regra `nonzero`: o `getBBox` devolvia 44×88 e a tela ficava vazia.
+   *
+   * Trocar só o sentido para `0` fez pintar, mas virou um disco: com raio 36
+   * para uma corda de 88, o SVG escala o raio até caber e o arco interno vira
+   * outra semicircunferência, fechando o círculo.
+   *
+   * O raio interno precisa ser **maior** que o externo para a curva ser mais
+   * rasa e sobrar a foice. Medido rasterizando: r=90 dá 33 unidades de
+   * espessura no viewBox de 100 — massa sólida, não traço fino, que é a regra
+   * deste arquivo.
+   *
+   * Importa porque `lua` é a figurinha do cantinho calmo, o recurso mais usado
+   * em crise sensorial: a figura que não aparecia era justamente a necessária.
+   */
   lua: {
-    corpo: 'M62 6a44 44 0 1 0 0 88 36 36 0 0 1 0-88Z',
+    corpo: 'M62 6a44 44 0 1 0 0 88 90 90 0 0 1 0-88Z',
+  },
+
+  nota: {
+    corpo: 'M84 8v50a20 20 0 1 1-16-19.6V32L40 40v42a20 20 0 1 1-16-19.6V28L84 8Z',
+  },
+  livro: {
+    corpo: 'M10 16h32c5 0 8 3 8 8v62c0-5-3-8-8-8H10V16Zm80 0H58c-5 0-8 3-8 8v62c0-5 3-8 8-8h32V16Z',
+  },
+  maca: {
+    corpo:
+      'M50 24c15 0 27 13 27 32S65 92 50 92 23 75 23 56s12-32 27-32Zm4-2c0-9 7-16 16-18-2 11-7 17-16 18Z',
+  },
+  copo: {
+    corpo: 'M22 16h56l-7 70a10 10 0 0 1-10 9H39a10 10 0 0 1-10-9L22 16Z',
+  },
+  gota: {
+    corpo: 'M50 6c19 26 31 40 31 54a31 31 0 1 1-62 0c0-14 12-28 31-54Z',
+  },
+  ampulheta: {
+    corpo: 'M20 6h60v18L54 50l26 26v18H20V76l26-26L20 24V6Z',
+  },
+  fone: {
+    corpo:
+      'M50 8c-23 0-40 17-40 40v24a10 10 0 0 0 10 10h10a8 8 0 0 0 8-8V56a8 8 0 0 0-8-8h-4v-1c0-13 11-24 24-24s24 11 24 24v1h-4a8 8 0 0 0-8 8v18a8 8 0 0 0 8 8h10a10 10 0 0 0 10-10V48c0-23-17-40-40-40Z',
+  },
+  lapis: {
+    corpo: 'M70 6l24 24-48 48-28 8 8-28L70 6Z',
   },
 };
+
+/** Exposto para o teste que verifica que toda silhueta pinta área. */
+export const DESENHOS_PARA_TESTE = DESENHOS;
 
 type Props = {
   id: IdDeSilhueta;
