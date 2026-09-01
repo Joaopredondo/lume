@@ -33,12 +33,21 @@ const NOMES_DE_TAMANHO: Record<NomeTamanho, string> = {
  * Contraste entre os três tamanhos. Começa fácil (bem diferentes) e fecha
  * quando ela acerta em sequência — o "diminuindo de tamanho" do pedido.
  * O cuidador também sobe/desce o tamanho global pelo painel.
+ *
+ * Tupla, não array: com noUncheckedIndexedAccess, CONTRASTE[0] de um array
+ * comum seria possivelmente undefined e o `tsc -b` do deploy falha.
  */
-const CONTRASTE: Record<NomeTamanho, number>[] = [
+const CONTRASTE = [
   { pequeno: 0.45, medio: 0.8, grande: 1.25 },
   { pequeno: 0.58, medio: 0.88, grande: 1.18 },
   { pequeno: 0.7, medio: 0.95, grande: 1.12 },
-];
+] as const;
+
+function contrasteDoNivel(nivel: number): Record<NomeTamanho, number> {
+  if (nivel <= 0) return CONTRASTE[0];
+  if (nivel >= 2) return CONTRASTE[2];
+  return CONTRASTE[1];
+}
 
 type Opcao = { cor: TokenDeCor; formato: Formato; tamanho: NomeTamanho };
 
@@ -115,7 +124,7 @@ export function FormasETamanhos({ posicao }: PropsDoModulo) {
   const { altura } = useDimensoes();
 
   const cores = perfil.coresComResposta;
-  const contraste = CONTRASTE[Math.min(nivelContraste, CONTRASTE.length - 1)] ?? CONTRASTE[0];
+  const contraste = contrasteDoNivel(nivelContraste);
 
   const sortear = useCallback(() => {
     const montagem = montar(cores);
