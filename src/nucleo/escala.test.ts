@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   LARGURA_CARTAO_MM,
   LIMIAR_PADRAO_GRAUS,
+  MULTIPLO_TAMANHO_MAX,
+  MULTIPLO_TAMANHO_MIN,
+  ajustarMultiploDeTamanho,
   calibracaoEhPlausivel,
   grausParaPx,
   pxParaGraus,
@@ -117,5 +120,14 @@ describe('tamanhoDoEstimulo', () => {
   it('o padrão sem calibração nenhuma é o limiar conservador', () => {
     expect(PERFIL_PADRAO.limiarAngular).toBeNull();
     expect(LIMIAR_PADRAO_GRAUS).toBeGreaterThan(0);
+  });
+});
+
+describe('ajustarMultiploDeTamanho', () => {
+  it('encolhe e cresce sem sair do piso nem do teto', () => {
+    expect(ajustarMultiploDeTamanho(1, 0.85)).toBeCloseTo(0.85, 5);
+    expect(ajustarMultiploDeTamanho(1, 1.12)).toBeCloseTo(1.12, 5);
+    expect(ajustarMultiploDeTamanho(MULTIPLO_TAMANHO_MIN, 0.5)).toBe(MULTIPLO_TAMANHO_MIN);
+    expect(ajustarMultiploDeTamanho(MULTIPLO_TAMANHO_MAX, 2)).toBe(MULTIPLO_TAMANHO_MAX);
   });
 });

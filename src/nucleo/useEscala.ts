@@ -23,10 +23,12 @@ export function useDimensoes(): Dimensoes {
 export function useTamanhoDoEstimulo(): (multiplo?: number) => number {
   const perfil = useStore((estado) => estado.perfil);
   const aparelho = useStore((estado) => estado.calibracaoAparelho);
+  const multiploSessao = useStore((estado) => estado.configuracoes.multiploTamanho);
   const { menorDimensao } = useDimensoes();
 
   return useCallback(
-    (multiplo = 1) => tamanhoDoEstimulo(perfil, aparelho, menorDimensao, multiplo),
-    [perfil, aparelho, menorDimensao],
+    (multiplo = 1) =>
+      tamanhoDoEstimulo(perfil, aparelho, menorDimensao, multiplo * (multiploSessao || 1)),
+    [perfil, aparelho, menorDimensao, multiploSessao],
   );
 }

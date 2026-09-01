@@ -94,6 +94,28 @@ export type Configuracoes = {
   itensPorRodada: number;
   /** A legenda de Círculos e setas some para quem já memorizou a regra. */
   mostrarLegenda: boolean;
+  /**
+   * Multiplicador de tamanho do estímulo nesta sessão.
+   *
+   * 1 = limiar do perfil. O cuidador sobe e desce pelo painel (Maior/Menor),
+   * e os módulos de escolha encolhem um pouco quando ela acerta em sequência —
+   * ou aumentam quando o toque erra o alvo, para ela alcançar. Não persiste:
+   * cada sessão começa no limiar.
+   */
+  multiploTamanho: number;
+  /**
+   * Quantas formas Cores e formas mostra no começo da rodada.
+   * O pedido da Livinha: três, não duas. O cuidador muda aqui; a progressão
+   * automática sobe até cinco se estiver ligada.
+   */
+  formasIniciais: number;
+  /** Se ligada, dois acertos seguidos entram mais uma forma (até 5). */
+  progressaoQuantidade: boolean;
+  /**
+   * Se ligada, acerto em sequência encolhe um pouco o estímulo; toque fora
+   * do alvo aumenta, para ela alcançar. Sem placar — só o tamanho muda.
+   */
+  progressaoTamanho: boolean;
 };
 
 export const CONFIGURACOES_PADRAO: Configuracoes = {
@@ -107,6 +129,10 @@ export const CONFIGURACOES_PADRAO: Configuracoes = {
   sortearPosicao: false,
   itensPorRodada: 5,
   mostrarLegenda: true,
+  multiploTamanho: 1,
+  formasIniciais: 3,
+  progressaoQuantidade: true,
+  progressaoTamanho: true,
 };
 
 export const PERFIL_PADRAO: Perfil = {

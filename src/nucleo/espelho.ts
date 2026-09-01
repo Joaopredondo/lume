@@ -54,10 +54,12 @@ export function abrirEspelhoLocal(aoReceber: (mensagem: Mensagem) => void): Tran
 }
 
 /** Lê o papel da URL: `?papel=controle` abre a superfície de comando. */
-export function papelDaUrl(busca: string = window.location.search): Papel {
-  return new URLSearchParams(busca).get('papel') === 'controle' ? 'controle' : 'palco';
+export function papelDaUrl(busca?: string): Papel {
+  const origem = busca ?? (typeof window === 'undefined' ? '' : window.location.search);
+  return new URLSearchParams(origem).get('papel') === 'controle' ? 'controle' : 'palco';
 }
 
-export function enderecoDoControle(origem: string = window.location.origin): string {
-  return `${origem}/?papel=controle`;
+export function enderecoDoControle(origem?: string): string {
+  const base = origem ?? (typeof window === 'undefined' ? '' : window.location.origin);
+  return `${base}/?papel=controle`;
 }
