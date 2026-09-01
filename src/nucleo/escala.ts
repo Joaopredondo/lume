@@ -101,3 +101,13 @@ function fracaoDaTela(graus: number, menorDimensao: number): number {
   // Um estímulo maior que a tela deixa de ser uma forma e vira um fundo.
   return Math.min(menorDimensao * fracao, menorDimensao);
 }
+
+/** Piso e teto do multiplicador de sessão — cabe no campo visual sem virar fundo. */
+export const MULTIPLO_TAMANHO_MIN = 0.5;
+export const MULTIPLO_TAMANHO_MAX = 1.8;
+
+/** Ajusta o multiplicador de tamanho da sessão, com teto e piso. */
+export function ajustarMultiploDeTamanho(atual: number, fator: number): number {
+  const proximo = atual * fator;
+  return Math.min(MULTIPLO_TAMANHO_MAX, Math.max(MULTIPLO_TAMANHO_MIN, proximo));
+}

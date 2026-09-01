@@ -28,6 +28,46 @@ type Estado = {
   definirCalibracaoAparelho: (calibracao: CalibracaoDeAparelho) => Promise<void>;
 };
 
+const CHAVE_PREFERENCIAS = 'lume-config';
+
+/** Só o que o cuidador escolhe de propósito. O multiplicador de tamanho é da sessão. */
+type PreferenciasPersistidas = Pick<
+  Configuracoes,
+  'formasIniciais' | 'progressaoQuantidade' | 'progressaoTamanho'
+>;
+
+function lerPreferencias(): Partial<PreferenciasPersistidas> {
+  try {
+    const cru = localStorage.getItem(CHAVE_PREFERENCIAS);
+    if (!cru) return {};
+    const parsed = JSON.parse(cru) as Partial<Configuracoes>;
+    const limpo: Partial<PreferenciasPersistidas> = {};
+    if (typeof parsed.formasIniciais === 'number') limpo.formasIniciais = parsed.formasIniciais;
+    if (typeof parsed.progressaoQuantidade === 'boolean') {
+      limpo.progressaoQuantidade = parsed.progressaoQuantidade;
+    }
+    if (typeof parsed.progressaoTamanho === 'boolean') {
+      limpo.progressaoTamanho = parsed.progressaoTamanho;
+    }
+    return limpo;
+  } catch {
+    return {};
+  }
+}
+
+function gravarPreferencias(config: Configuracoes) {
+  try {
+    const fatia: PreferenciasPersistidas = {
+      formasIniciais: config.formasIniciais,
+      progressaoQuantidade: config.progressaoQuantidade,
+      progressaoTamanho: config.progressaoTamanho,
+    };
+    localStorage.setItem(CHAVE_PREFERENCIAS, JSON.stringify(fatia));
+  } catch {
+    /* aparelho sem storage */
+  }
+}
+
 export const useStore = create<Estado>((set, get) => ({
   perfil: PERFIL_PADRAO,
   perfis: [],
@@ -44,6 +84,13 @@ export const useStore = create<Estado>((set, get) => ({
         perfis,
         perfil: perfis[0] ?? PERFIL_PADRAO,
         calibracaoAparelho: calibracao,
+        configuracoes: {
+          ...CONFIGURACOES_PADRAO,
+          ...lerPreferencias(),
+          // Sempre no limiar ao abrir o app — o tamanho da sessão anterior
+          // não pode vazar para a próxima.
+          multiploTamanho: 1,
+        },
         carregado: true,
       });
     } catch {
@@ -71,7 +118,11 @@ export const useStore = create<Estado>((set, get) => ({
   },
 
   ajustar: (mudanca) =>
-    set((estado) => ({ configuracoes: { ...estado.configuracoes, ...mudanca } })),
+    set((estado) => {
+      const configuracoes = { ...estado.configuracoes, ...mudanca };
+      gravarPreferencias(configuracoes);
+      return { configuracoes };
+    }),
 
   definirCalibracaoAparelho: async (calibracaoAparelho) => {
     set({ calibracaoAparelho });

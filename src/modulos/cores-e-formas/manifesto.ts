@@ -6,14 +6,12 @@ export const manifesto: ManifestoDeModulo = {
   nome: 'Cores e formas',
   icone: 'formas',
   nivel: 'intermediario',
-  // As duas opções ocupam metade da tela cada: o layout é a própria escolha,
-  // então não há posição a variar.
   posicoesSuportadas: ['centro'],
-  resumo: 'Duas opções, metade da tela cada; a instrução é falada.',
+  resumo: 'Três formas na tela; a instrução é falada. Mais formas quando ela acerta.',
   comoUsar:
-    'A voz pede uma forma de uma cor. As duas opções diferem só na cor ou só na forma, nunca nas duas. Tocar na errada não tem penalidade: a instrução é repetida com calma.',
+    'A voz pede uma forma de uma cor. Começa com três opções. Cada distrator difere só na cor ou só na forma, nunca nas duas. Tocar na errada não tem penalidade: a instrução é repetida com calma. Dois acertos seguidos entram mais uma forma (até cinco) e o tamanho encolhe um pouco. No painel: Mais formas, Menos formas, Maior, Menor.',
   oQueObservar:
-    'Se procura antes de tocar, se erra sempre para o mesmo lado da tela, e se acerta mais por cor ou por forma.',
+    'Se procura antes de tocar, se erra sempre para o mesmo lado da tela, se acerta mais por cor ou por forma, e a partir de quantas opções a resposta cai.',
 
   componente: CoresEFormas,
 };

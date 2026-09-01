@@ -147,6 +147,33 @@ export function Configuracao() {
         />
       </Grupo>
 
+      <Grupo titulo="Cores e formas">
+        <Deslizante
+          rotulo="Formas no começo"
+          explicacao="Quantas formas aparecem quando o módulo abre. O pedido da Livinha foi três — círculo, quadrado e triângulo. Dá para começar com duas se ainda estiver difícil, ou quatro se ela já discrimina bem."
+          valor={configuracoes.formasIniciais}
+          minimo={2}
+          maximo={5}
+          passo={1}
+          formatar={(v) => String(v)}
+          aoMudar={(formasIniciais) => ajustar({ formasIniciais })}
+        />
+        <Chave
+          rotulo="Aumentar quantidade quando acerta"
+          explicacao="Dois acertos seguidos entram mais uma forma, até cinco. Sem placar e sem som de erro — só a tela fica um pouco mais cheia. Desligue se quiser manter a quantidade fixa e mudar só pelo painel (Mais formas / Menos formas)."
+          ligado={configuracoes.progressaoQuantidade}
+          aoAlternar={() =>
+            ajustar({ progressaoQuantidade: !configuracoes.progressaoQuantidade })
+          }
+        />
+        <Chave
+          rotulo="Ajustar tamanho quando acerta"
+          explicacao="Acerto em sequência encolhe um pouco o estímulo; toque fora do alvo aumenta, para ela alcançar. Vale em Cores e formas e em Formas e tamanhos. O painel do cuidador também tem Maior e Menor, a qualquer momento."
+          ligado={configuracoes.progressaoTamanho}
+          aoAlternar={() => ajustar({ progressaoTamanho: !configuracoes.progressaoTamanho })}
+        />
+      </Grupo>
+
       <Grupo titulo="Círculos e setas">
         <Deslizante
           rotulo="Itens por rodada"

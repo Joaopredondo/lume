@@ -16,8 +16,19 @@ import type { PropsDoModulo } from '../registro';
 import { ALFABETO } from './palavras';
 
 /**
- * Alfabeto — uma letra gigante por vez, cor sorteada entre as que o perfil
- * confirmou.
+ * Cor estável por letra: A amarelo, B laranja, C ciano... e volta a circular.
+ * Cada letra consecutiva tem cor diferente — "uma letra de cada cor".
+ * Não sorteia: a mesma letra é sempre a mesma cor, para ela associar.
+ */
+export function corDaLetra(letra: string, cores: TokenDeCor[]): TokenDeCor {
+  if (cores.length === 0) return 'amarelo-sinal';
+  const codigo = letra.toUpperCase().charCodeAt(0);
+  const indice = ((codigo - 65) % cores.length + cores.length) % cores.length;
+  return cores[indice] ?? 'amarelo-sinal';
+}
+
+/**
+ * Alfabeto — uma letra gigante por vez, cada letra com a sua cor.
  *
  * O toque fala a letra e depois a palavra, revelando a silhueta. Letra sem
  * silhueta continua funcionando: a palavra é falada e a letra segue sendo o
@@ -54,7 +65,7 @@ export function Alfabeto({ posicao }: PropsDoModulo) {
   );
 
   const entrada = lista[indice] ?? lista[0];
-  const [cor, setCor] = useState<TokenDeCor>(() => cores[0] ?? 'amarelo-sinal');
+  const cor = corDaLetra(entrada?.letra ?? 'A', cores);
 
   const lado = tamanho();
   const caixa = estiloDePosicao(posicao, lado, largura, altura);
@@ -91,8 +102,7 @@ export function Alfabeto({ posicao }: PropsDoModulo) {
       if (proximo === 0) avisarVolta();
       return proximo;
     });
-    setCor(cores[Math.floor(Math.random() * cores.length)] ?? 'amarelo-sinal');
-  }, [avisarVolta, cores, entrada, lista.length, revelado]);
+  }, [avisarVolta, entrada, lista.length, revelado]);
 
   useEffect(() => {
     const elemento = container.current;

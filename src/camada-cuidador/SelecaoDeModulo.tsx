@@ -103,7 +103,13 @@ function Previa({ id }: { id: string }) {
   }
 
   if (id === 'alfabeto') {
-    return <span className="font-estimulo text-7xl font-extrabold text-amarelo-sinal">A</span>;
+    return (
+      <span className="flex items-end gap-3 font-estimulo font-extrabold">
+        <span className="text-5xl text-amarelo-sinal">A</span>
+        <span className="text-5xl text-laranja-sinal">B</span>
+        <span className="text-5xl text-ciano-sinal">C</span>
+      </span>
+    );
   }
 
   if (id === 'numeros') {
@@ -121,9 +127,12 @@ function Previa({ id }: { id: string }) {
 
   if (id === 'cores-e-formas') {
     return (
-      <span className="flex items-center gap-10">
-        <span className="size-14 rounded-full bg-vermelho-sinal" />
-        <span className="size-14 bg-verde-sinal" />
+      <span className="flex items-center gap-6">
+        <span className="size-12 rounded-full bg-vermelho-sinal" />
+        <span className="size-12 bg-verde-sinal" />
+        <svg viewBox="0 0 100 100" className="size-12" aria-hidden>
+          <path d="M50 6 96 92H4L50 6Z" fill="var(--color-amarelo-sinal)" />
+        </svg>
       </span>
     );
   }
@@ -165,6 +174,31 @@ function Previa({ id }: { id: string }) {
             transform="rotate(180 50 50)"
           />
         </svg>
+      </span>
+    );
+  }
+
+  if (id === 'formas-e-tamanhos') {
+    return (
+      <span className="flex items-end gap-5">
+        <span className="size-8 rounded-full bg-ciano-sinal" />
+        <span className="size-12 bg-verde-sinal" />
+        <svg viewBox="0 0 100 100" className="size-20" aria-hidden>
+          <path d="M50 6 96 92H4L50 6Z" fill="var(--color-laranja-sinal)" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (id === 'agora-e-depois') {
+    return (
+      <span className="flex gap-3">
+        <span className="grid size-16 place-items-center rounded-lg bg-superficie ring-2 ring-amarelo-sinal">
+          <span className="size-8 rounded-full bg-amarelo-sinal" />
+        </span>
+        <span className="grid size-16 place-items-center rounded-lg bg-superficie ring-2 ring-texto-secundario/40">
+          <span className="size-8 bg-ciano-sinal" />
+        </span>
       </span>
     );
   }
