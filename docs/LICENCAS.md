@@ -23,6 +23,21 @@ Desenhada especificamente para baixa visão, com foco em distinção entre lette
 
 O `.woff2` foi extraído do pacote `@fontsource-variable/space-grotesk` (o repositório `google/fonts` publica só `.ttf`) e copiado para `public/fonts`. O pacote não é dependência do projeto.
 
+## Silhuetas
+
+Os desenhos de `src/design/silhuetas.tsx` não são feitos à mão: cada `path` vem de um conjunto de ícones livre, copiado para dentro do código (nada é carregado da rede, o app segue 100% offline). Os `paths` foram só normalizados (escala e posição no `viewBox` 100×100). Emojis coloridos foram posterizados: o claro virou massa de cor, o escuro virou recorte preto. O comentário acima de cada entrada em `DESENHOS` diz de onde veio.
+
+| Conjunto                                                           | Autor                                   | Licença                                                   | Desenhos                                                                                                                                                                                         |
+| ------------------------------------------------------------------ | --------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Font Awesome Free 6 Solid](https://fontawesome.com)               | Fonticons, Inc. (Dave Gandy)            | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | peixe, passarinho, gato, hipopótamo, vaca, sapo, kiwi, mão, nuvem, ovo, queijo, xícara, wafer, iogurte, casa, coração, estrela, lua, ampulheta, fone, nota, livro, maçã, lápis, copo, gota, bola |
+| [game-icons.net](https://game-icons.net)                           | Lorc, Delapouite e outros colaboradores | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) | polvo, elefante, dado, ilha, janela, rato, tartaruga, uva                                                                                                                                        |
+| [Emoji One Monotone](https://github.com/joypixels/emojione-assets) | Emoji One                               | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | borboleta                                                                                                                                                                                        |
+| [Twemoji](https://github.com/jdecked/twemoji)                      | Twitter, Inc. e colaboradores           | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | foca, zebra                                                                                                                                                                                      |
+| [Firefox OS Emoji (FxEmoji)](https://github.com/mozilla/fxemoji)   | Mozilla                                 | Apache 2.0                                                | abelha                                                                                                                                                                                           |
+| [Pico-icon](https://github.com/yne/picon)                          | Colaboradores do Picon                  | SIL OFL 1.1                                               | baleia                                                                                                                                                                                           |
+
+As licenças CC BY exigem atribuição; esta tabela é a atribuição. Os ícones foram modificados (escala, posição e, nos emojis, posterização).
+
 ## Dependências
 
 Todas MIT ou Apache-2.0, exceto onde indicado. Ver `package.json` e `npm ls`.

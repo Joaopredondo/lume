@@ -6,7 +6,8 @@ import { DESENHOS_PARA_TESTE } from './silhuetas';
  *
  * Existe porque a `lua` passou meses no repositório sem desenhar nada: os dois
  * arcos tinham sweep no mesmo sentido e se anulavam pela regra `nonzero`. A
- * geometria estava lá, o `getBBox` devolvia 44×88, e a tela ficava vazia.
+ * geometria estava lá, o `getBBox` devolvia 44×88, e a tela ficava vazia. Hoje
+ * os paths vêm de conjuntos de ícones, mas a prova de massa continua valendo.
  *
  * A figura silenciosamente ausente era a do cantinho calmo — o recurso mais
  * usado em crise sensorial. Um `path` que não pinta é pior que um que falta:
@@ -34,30 +35,23 @@ describe('silhuetas', () => {
     }
   });
 
-  it('a lua tem arco interno mais raso que o externo', () => {
-    // Raio interno menor que a metade da corda faz o SVG escalar o raio e
-    // fechar um disco. Maior que o externo é o que deixa sobrar a foice.
-    const arcos = [...DESENHOS_PARA_TESTE.lua.corpo.matchAll(/(\d+) \1 0 [01] [01]/g)];
-    expect(arcos.length).toBe(2);
-    expect(Number(arcos[1]?.[1])).toBeGreaterThan(Number(arcos[0]?.[1]));
+  it('todo detalhe também começa em M e fecha em Z', () => {
+    for (const [id, desenho] of entradas) {
+      for (const d of desenho.detalhes ?? []) {
+        expect(d.trim().startsWith('M'), `${id}: detalhe começa em M`).toBe(true);
+        expect(d.trim().toUpperCase().endsWith('Z'), `${id}: detalhe fecha em Z`).toBe(true);
+      }
+    }
   });
 
-  it('nenhum arco tem raio menor que a metade da corda que atravessa', () => {
-    /*
-     * Foi assim que a lua quebrou duas vezes. Raio insuficiente faz o SVG
-     * escalá-lo até caber, e o arco vira uma semicircunferência — que ou anula
-     * o contorno (nada pinta) ou fecha um disco.
-     *
-     * Só cobre arcos verticais com deslocamento em y, que é a forma que os
-     * desenhos deste arquivo usam. A prova de que a figura realmente pinta é
-     * feita em navegador, em `e2e/silhuetas.spec.ts`.
-     */
+  it('só usa comandos absolutos, que sobrevivem a qualquer concatenação', () => {
+    // O gerador normaliza com `abs()`. Comando relativo no começo de um
+    // subcaminho seria lido a partir do ponto errado se alguém juntasse paths.
     for (const [id, desenho] of entradas) {
-      for (const arco of desenho.corpo.matchAll(/([\d.]+) ([\d.]+) 0 [01] [01] 0(-?[\d.]+)/g)) {
-        const raio = Number(arco[1]);
-        const corda = Math.abs(Number(arco[3]));
-        expect(raio * 2, `${id}: raio ${raio} para corda ${corda}`).toBeGreaterThanOrEqual(corda);
-      }
+      expect(
+        /[mlhvcsqta]/.test(desenho.corpo.replace(/[eE]/g, '')),
+        `${id}: comando relativo`,
+      ).toBe(false);
     }
   });
 });
