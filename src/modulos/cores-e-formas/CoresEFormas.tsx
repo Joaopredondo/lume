@@ -169,7 +169,10 @@ export function CoresEFormas({ posicao }: PropsDoModulo) {
             ajustar({ multiploTamanho: ajustarMultiploDeTamanho(atual, 0.85) });
           }
           if (progressaoQuantidade && quantidade < QUANTIDADE_MAXIMA) {
-            window.setTimeout(() => setQuantidade((q) => Math.min(QUANTIDADE_MAXIMA, q + 1)), DURACAO.fade);
+            window.setTimeout(
+              () => setQuantidade((q) => Math.min(QUANTIDADE_MAXIMA, q + 1)),
+              DURACAO.fade,
+            );
             return;
           }
         }
