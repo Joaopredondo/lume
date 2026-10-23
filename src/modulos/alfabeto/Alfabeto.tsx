@@ -23,7 +23,7 @@ import { ALFABETO } from './palavras';
 export function corDaLetra(letra: string, cores: TokenDeCor[]): TokenDeCor {
   if (cores.length === 0) return 'amarelo-sinal';
   const codigo = letra.toUpperCase().charCodeAt(0);
-  const indice = ((codigo - 65) % cores.length + cores.length) % cores.length;
+  const indice = (((codigo - 65) % cores.length) + cores.length) % cores.length;
   return cores[indice] ?? 'amarelo-sinal';
 }
 

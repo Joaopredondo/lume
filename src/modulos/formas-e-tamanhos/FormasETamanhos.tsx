@@ -149,14 +149,11 @@ export function FormasETamanhos({ posicao }: PropsDoModulo) {
     });
   }, [alvo, perfil.limiarAngular, perfil.pesoFonte, posicao]);
 
-  const bate = useCallback(
-    (opcao: Opcao, alvoAtual: Opcao, criterioAtual: Criterio): boolean => {
-      if (criterioAtual === 'tamanho') return opcao.tamanho === alvoAtual.tamanho;
-      if (criterioAtual === 'cor') return opcao.cor === alvoAtual.cor;
-      return opcao.formato === alvoAtual.formato;
-    },
-    [],
-  );
+  const bate = useCallback((opcao: Opcao, alvoAtual: Opcao, criterioAtual: Criterio): boolean => {
+    if (criterioAtual === 'tamanho') return opcao.tamanho === alvoAtual.tamanho;
+    if (criterioAtual === 'cor') return opcao.cor === alvoAtual.cor;
+    return opcao.formato === alvoAtual.formato;
+  }, []);
 
   const responder = useCallback(
     (acertou: boolean, alvoAtual: Opcao, criterioAtual: Criterio) => {

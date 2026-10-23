@@ -162,9 +162,7 @@ export function Configuracao() {
           rotulo="Aumentar quantidade quando acerta"
           explicacao="Dois acertos seguidos entram mais uma forma, até cinco. Sem placar e sem som de erro — só a tela fica um pouco mais cheia. Desligue se quiser manter a quantidade fixa e mudar só pelo painel (Mais formas / Menos formas)."
           ligado={configuracoes.progressaoQuantidade}
-          aoAlternar={() =>
-            ajustar({ progressaoQuantidade: !configuracoes.progressaoQuantidade })
-          }
+          aoAlternar={() => ajustar({ progressaoQuantidade: !configuracoes.progressaoQuantidade })}
         />
         <Chave
           rotulo="Ajustar tamanho quando acerta"

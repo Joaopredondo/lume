@@ -7,6 +7,7 @@ import { CoresEFormas } from './cores-e-formas/CoresEFormas';
 import { FormasETamanhos } from './formas-e-tamanhos/FormasETamanhos';
 import { Numeros } from './numeros/Numeros';
 import { moduloPorId } from './registro';
+import { DESENHOS_PARA_TESTE } from '../design/silhuetas';
 import { limparEventos } from '../nucleo/eventos';
 
 const falas: string[] = [];
@@ -90,12 +91,16 @@ describe('Alfabeto', () => {
     expect(screen.getByLabelText('A').textContent).toBe('a');
   });
 
-  it('toda letra tem palavra, e letra sem silhueta não é caso de erro', () => {
+  it('toda letra tem palavra e uma silhueta que existe no catálogo', () => {
     expect(ALFABETO).toHaveLength(26);
     for (const entrada of ALFABETO) {
-      expect(entrada.palavra.length).toBeGreaterThan(1);
+      expect(entrada.palavra.length, entrada.letra).toBeGreaterThan(1);
+      expect(entrada.silhueta, `${entrada.letra}: sem silhueta`).toBeDefined();
+      expect(
+        Object.keys(DESENHOS_PARA_TESTE),
+        `${entrada.letra}: silhueta ${entrada.silhueta} fora do catálogo`,
+      ).toContain(entrada.silhueta);
     }
-    expect(ALFABETO.some((e) => e.silhueta === undefined)).toBe(true);
   });
 
   it('letras consecutivas têm cores diferentes, e a mesma letra é estável', () => {
